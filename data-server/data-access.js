@@ -17,8 +17,8 @@ async function dbStartup() {
 }
 
 // Declaring getAllCustomers method - 
-// Use this Method to get the customers list from mongodb.
-async function getAllCustomers () {
+// Use this Method to get the customers list from mongodb database.
+async function getAllCustomers() {
     try {
         // Getting the customers list from custbd on MongoDb 
         const customer = await customersConecction.find().toArray();
@@ -31,8 +31,8 @@ async function getAllCustomers () {
 };
 
 // Declaring getCustomerByID method - 
-// Use this Method to get the customer data filtered by ID from mongodb.
-async function getCustomerByID (id) {
+// Use this Method to get the customer data filtered by ID from mongodb database.
+async function getCustomerByID(id) {
     try {
         // Getting the customer by ID from custbd on MongoDb 
         const customers = await customersConecction.findOne({"id": +id});
@@ -47,8 +47,8 @@ async function getCustomerByID (id) {
 };
 
 // Declaring getCustomerByID method - 
-// Use this Method to get the customer data filtered by ID from mongodb.
-async function resetCustomers () {
+// Use this Method to get the customer data filtered by ID from mongodb database.
+async function resetCustomers() {
     try {
         // Getting the customer by ID from custbd on MongoDb 
         let data = [
@@ -73,8 +73,22 @@ async function resetCustomers () {
     }
 };
 
+// Declaring addCustomer method - 
+// Use this Method to add new the customers into the mongodb database.
+async function addCustomer(newCustomerInfo) {
+    try {
+        // Creating the new record into the database
+        const insertCustomerResult = await customersConecction.insertOne(newCustomerInfo);
+        return ["success", insertCustomerResult.insertedId, null];
+
+    } catch (err) {
+        console.log(err.message)
+        return [null, err.message];
+    }
+    
+}
 
 
 dbStartup();
 // Exporting the methods
-export  { getAllCustomers, getCustomerByID, resetCustomers };
+export  { getAllCustomers, getCustomerByID, resetCustomers, addCustomer };

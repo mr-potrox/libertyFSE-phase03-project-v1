@@ -1,6 +1,7 @@
 import express from "express";
 import path from "path"; // for handling file paths.
-import {getAllCustomers, getCustomerByID,resetCustomers} from "../data-server/data-access.js"; //Import 
+import bodyParser from "body-parser"; // for handling file paths.
+import {getAllCustomers, getCustomerByID,resetCustomers, addCustomer} from "../data-server/data-access.js"; //Import 
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file.
@@ -9,7 +10,7 @@ const __dirname = path.dirname(__filename); // get the name of the directory.
 console.log(__dirname)
 // Start the express app object.
 var app = express();
-app.use(express.json());
+app.use(bodyParser.json());
 
 const port = process.env.PORT || 4000; // use env var or default to 4000.
 
@@ -56,6 +57,30 @@ app.get("/reset", async (req, res)=> {
     } 
 });
 
+// Add the add new customer route.
+app.post("/customers", async (req, res)=> {
+    // Getting the new customer data from the request body.
+    const newCustomerInfo = req.body;
+    // Checking if the body request is empty.
+    if (newCustomerInfo === null|| newCustomerInfo == {}) {
+        // notifying the error.
+        res.status(400);
+        res.send("missing request body, Please check your request and try again");
+    } else {
+        // Adding the new customer data into de mongodb database
+        const [status, id, errMsg] = await addCustomer(newCustomerInfo);
+        // Checking if the process above finished successfully or not.
+        if(status === 'success'){
+            res.status(201);
+            let response = { ...newCustomerInfo };
+            response["_id"] = id;
+            res.send(response);
+        }else{
+            res.status(400);
+            res.send(errMsg);
+        }
+    }
+});
 
 
 
