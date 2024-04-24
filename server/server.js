@@ -22,8 +22,14 @@ app.listen(port, () => {
 
 // Add the get route.
 app.get("/customers", async (req, res)=> {
-    const cust = await getAllCustomers();
-    res.send(cust);
+    const [cust, err] = await getAllCustomers();
+    // adding error handler
+    if(cust){
+        res.send(cust);
+    }else{
+        res.status(500);
+        res.send(err);
+    } 
 });
 
 // Add the get customers by ID route.

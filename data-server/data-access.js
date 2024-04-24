@@ -21,12 +21,9 @@ async function dbStartup() {
 async function getAllCustomers () {
     try {
         // Getting the customers list from custbd on MongoDb 
-        const customer = await customers.find().toArray();;
-        if(!customer){
-            return [ null, "invalid customer number"];
-        }
-        console.log('entramos');
+        const customer = await customers.find().toArray();
         return [customer, null];
+        
     } catch (err) {
         console.log(err.message);
         return [null, err.message];
