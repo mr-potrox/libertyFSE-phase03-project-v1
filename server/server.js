@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path"; // for handling file paths.
 import bodyParser from "body-parser"; // for handling file paths.
-import {getAllCustomers, getCustomerByID,resetCustomers, addCustomer, updateCustomer} from "../data-server/data-access.js"; //Import 
+import {getAllCustomers, getCustomerByID,resetCustomers, addCustomer, updateCustomer, deleteCustomerByID} from "../data-server/data-access.js"; //Import 
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file.
@@ -108,5 +108,15 @@ app.put("/customers/:id", async (req, res)=> {
     }
 });
 
-
+// Add the delete customers by ID route.
+app.delete("/customers/:id", async (req, res)=> {
+    const [cust, err] = await deleteCustomerByID(req.params.id);
+    // adding error handler
+    if(cust){
+        res.send(cust);
+    }else{
+        res.status(500);
+        res.send(err);
+    }
+});
 

@@ -88,8 +88,8 @@ async function addCustomer(newCustomerInfo) {
     
 }
 
-// Declaring addCustomer method - 
-// Use this Method to add new the customers into the mongodb database.
+// Declaring updateCustomer method - 
+// Use this Method to update  the customer data into the mongodb database.
 async function updateCustomer(updateCustomerInfo) {
     //Getting the customer id from the request
     const filter = {'id': updateCustomerInfo.id};
@@ -107,7 +107,25 @@ async function updateCustomer(updateCustomerInfo) {
     
 }
 
+// Declaring deleteCustomerByID method.
+// Use this Method to delete the customer data filtered by ID from mongodb database.
+async function deleteCustomerByID(id) {
+    try {
+        // Deleting the customer by ID from custbd on MongoDb 
+        const deleteResult = await customersConecction.deleteOne({"id": +id});
+        if(deleteResult.deletedCount === 0){
+          return [ null, "No record deleted"];
+        }else if(deleteResult.deletedCount === 1){
+            return [ "One record deleted", null];
+        } else{
+            return [null, "error deleting records"]
+        }
+    } catch (err) {
+        console.log(err.message);
+        return [null, err.message];
+    }
+};
 
 dbStartup();
 // Exporting the methods
-export  { getAllCustomers, getCustomerByID, resetCustomers, addCustomer, updateCustomer };
+export  { getAllCustomers, getCustomerByID, resetCustomers, addCustomer, updateCustomer, deleteCustomerByID };
