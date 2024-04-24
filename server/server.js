@@ -1,5 +1,6 @@
 import express from "express";
 import path from "path"; // for handling file paths.
+import {getAllCustomers, getCustomerByID} from "../data-server/data-access.js"; //Import 
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file.
@@ -19,6 +20,17 @@ app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
 });
 
+// Add the get route.
+app.get("/customers", async (req, res)=> {
+    const cust = await getAllCustomers();
+    res.send(cust);
+});
+
+// Add the get customers by ID route.
+app.get("/customers/:id", async (req, res)=> {
+    const cust = await getCustomerByID(req.params.id);
+    res.send(cust);
+});
 
 
 
