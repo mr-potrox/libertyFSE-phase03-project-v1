@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path"; // for handling file paths.
 import bodyParser from "body-parser"; // for handling file paths.
-import {getAllCustomers, getCustomerByID,resetCustomers, addCustomer} from "../data-server/data-access.js"; //Import 
+import {getAllCustomers, getCustomerByID,resetCustomers, addCustomer, updateCustomer} from "../data-server/data-access.js"; //Import 
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file.
@@ -61,8 +61,9 @@ app.get("/reset", async (req, res)=> {
 app.post("/customers", async (req, res)=> {
     // Getting the new customer data from the request body.
     const newCustomerInfo = req.body;
+
     // Checking if the body request is empty.
-    if (newCustomerInfo === null|| newCustomerInfo == {}) {
+    if (Object.keys(newCustomerInfo).length === 0) {
         // notifying the error.
         res.status(400);
         res.send("missing request body, Please check your request and try again");
@@ -75,6 +76,31 @@ app.post("/customers", async (req, res)=> {
             let response = { ...newCustomerInfo };
             response["_id"] = id;
             res.send(response);
+        }else{
+            res.status(400);
+            res.send(errMsg);
+        }
+    }
+});
+
+// Add the upodate customer data route.
+app.put("/customers/:id", async (req, res)=> {
+    // Getting the new customer data from the request body.
+    const updateCustomerInfo = req.body;
+    const updateCustomerId = req.params.id;
+    // Checking if the body request is empty.
+    if (Object.keys(updateCustomerInfo).length === 0) {
+        // notifying the error.
+        res.status(400);
+        res.send("missing request body, Please check your request and try again");
+    } else {
+        delete updateCustomerInfo._updateCustomerId;
+        // Adding the new customer data into de mongodb database
+        const [message, errMsg] = await updateCustomer(updateCustomerInfo);
+        // Checking if the process above finished successfully or not.
+        if(message){
+            res.status(201);
+            res.send(message);
         }else{
             res.status(400);
             res.send(errMsg);

@@ -88,7 +88,26 @@ async function addCustomer(newCustomerInfo) {
     
 }
 
+// Declaring addCustomer method - 
+// Use this Method to add new the customers into the mongodb database.
+async function updateCustomer(updateCustomerInfo) {
+    //Getting the customer id from the request
+    const filter = {'id': updateCustomerInfo.id};
+    //Getting the customer data to be updated form the reques
+    const data = {'$set': updateCustomerInfo};
+    try {
+        // Creating the new record into the database
+        const updateCustomerResult = await customersConecction.updateOne(filter, data);
+        return ["success", updateCustomerResult.id, null];
+
+    } catch (err) {
+        console.log(err.message)
+        return [null, err.message];
+    }
+    
+}
+
 
 dbStartup();
 // Exporting the methods
-export  { getAllCustomers, getCustomerByID, resetCustomers, addCustomer };
+export  { getAllCustomers, getCustomerByID, resetCustomers, addCustomer, updateCustomer };
