@@ -1,6 +1,6 @@
 import express from "express";
 import path from "path"; // for handling file paths.
-import {getAllCustomers, getCustomerByID} from "../data-server/data-access.js"; //Import 
+import {getAllCustomers, getCustomerByID,resetCustomers} from "../data-server/data-access.js"; //Import 
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file.
@@ -34,8 +34,26 @@ app.get("/customers", async (req, res)=> {
 
 // Add the get customers by ID route.
 app.get("/customers/:id", async (req, res)=> {
-    const cust = await getCustomerByID(req.params.id);
-    res.send(cust);
+    const [cust, err] = await getCustomerByID(req.params.id);
+    // adding error handler
+    if(cust){
+        res.send(cust);
+    }else{
+        res.status(500);
+        res.send(err);
+    } 
+});
+
+// Add the get customers by ID route.
+app.get("/reset", async (req, res)=> {
+    const [cust, err] = await resetCustomers();
+    // adding error handler
+    if(cust){
+        res.send(cust);
+    }else{
+        res.status(500);
+        res.send(err);
+    } 
 });
 
 
