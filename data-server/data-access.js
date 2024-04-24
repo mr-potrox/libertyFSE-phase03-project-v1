@@ -30,7 +30,7 @@ async function getAllCustomers() {
     }
 };
 
-// Declaring getCustomerByID method - 
+// Declaring getCustomerByID method.
 // Use this Method to get the customer data filtered by ID from mongodb database.
 async function getCustomerByID(id) {
     try {
