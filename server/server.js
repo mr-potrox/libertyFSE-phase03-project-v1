@@ -1,12 +1,10 @@
 import express from "express";
 import path from "path"; // for handling file paths.
 import bodyParser from "body-parser"; // for handling file paths.
-import dotenv from "dotenv";// for enabling the .env file.
 import {getAllCustomers, getCustomerByID,resetCustomers, addCustomer, updateCustomer, deleteCustomerByID} from "../data-server/data-access.js"; //Import 
 import {appMiddleware} from "../security/security_access.js"; //Import 
 import { fileURLToPath } from 'url';
 
-const dotenvConfig = dotenv.config();
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file.
 const __dirname = path.dirname(__filename); // get the name of the directory.
 // Start the express app object.
@@ -14,15 +12,6 @@ var app = express();
 const port = process.env.PORT || 4000; // use env var or default to 4000.
 
 app.use(bodyParser.json());
-
-
-
-// Check if the API key is provided as a command line argument and prioritize it
-const apiKeyFromCmd = process.argv.find(arg => arg.startsWith('--api-key='))
-if (apiKeyFromCmd) {
-    process.env.API_KEY = apiKeyFromCmd.split('=')[1];
-}
-
 
 // Set the static directory to serve files from.
 app.use(express.static(path.join(__dirname, '../public')));

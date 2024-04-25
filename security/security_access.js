@@ -1,6 +1,8 @@
+import dotenv from "dotenv";// for enabling the .env file.
+const dotenvConfig = dotenv.config();
+
 // Get the expected header value from environment variable
 let envApiKeyValue = process.env.API_KEY;
-
 // Check if the API key is provided as a command line argument and prioritize it
 const apiKeyFromCmd = process.argv.find(arg => arg.startsWith('--api-key='))
 if (apiKeyFromCmd) {
