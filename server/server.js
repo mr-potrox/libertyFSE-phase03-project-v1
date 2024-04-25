@@ -1,15 +1,16 @@
 import express from "express";
 import path from "path"; // for handling file paths.
 import bodyParser from "body-parser"; // for handling file paths.
+import dotenv from "dotenv";// for enabling the .env file.
 import {getAllCustomers, getCustomerByID,resetCustomers, addCustomer, updateCustomer, deleteCustomerByID} from "../data-server/data-access.js"; //Import 
 import { fileURLToPath } from 'url';
 
+const dotenvConfig = dotenv.config();
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file.
-console.log(__filename)
 const __dirname = path.dirname(__filename); // get the name of the directory.
-console.log(__dirname)
 // Start the express app object.
 var app = express();
+
 app.use(bodyParser.json());
 
 const port = process.env.PORT || 4000; // use env var or default to 4000.
@@ -17,12 +18,30 @@ const port = process.env.PORT || 4000; // use env var or default to 4000.
 // Set the static directory to serve files from.
 app.use(express.static(path.join(__dirname, '../public')));
 
-app.listen(port, () => {
-    console.log(`Server listening on port ${port}`);
-});
+// appMiddleware middleware function
+const appMiddleware = (req, res, next) => {
+    // Get the expected header value from environment variable
+    let expectedApiKeyValue = process.env.API_KEY;
+    // Get the value of the custom header from the request
+    const requestApiKeyValue = (req.headers['x-api-key']) ? req.headers['x-api-key'] : req.query.api_key;
+
+    if (!requestApiKeyValue) {
+        res.status(401).json({ message: 'Unauthorized: API Key is missing' }); // Respond with API Key is missing message
+        
+    } else {
+       // Check if the request header matches the expected API_KEY value
+        if (requestApiKeyValue === expectedApiKeyValue) {
+            next(); // Allow access to the endpoint
+        } else {
+            res.status(403).json({ message: 'Unauthorized: API Key is invalid' }); // Respond with unauthorized status
+        }
+    }
+    
+};
+
 
 // Add the get route.
-app.get("/customers", async (req, res)=> {
+app.get("/customers", appMiddleware, async (req, res)=> {
     const [cust, err] = await getAllCustomers();
     // adding error handler
     if(cust){
@@ -34,7 +53,7 @@ app.get("/customers", async (req, res)=> {
 });
 
 // Add the get customers by ID route.
-app.get("/customers/:id", async (req, res)=> {
+app.get("/customers/:id", appMiddleware, async (req, res)=> {
     const [cust, err] = await getCustomerByID(req.params.id);
     // adding error handler
     if(cust){
@@ -46,7 +65,7 @@ app.get("/customers/:id", async (req, res)=> {
 });
 
 // Add the get customers by ID route.
-app.get("/reset", async (req, res)=> {
+app.get("/reset", appMiddleware, async (req, res)=> {
     const [cust, err] = await resetCustomers();
     // adding error handler
     if(cust){
@@ -58,7 +77,7 @@ app.get("/reset", async (req, res)=> {
 });
 
 // Add the add new customer route.
-app.post("/customers", async (req, res)=> {
+app.post("/customers", appMiddleware, async (req, res)=> {
     // Getting the new customer data from the request body.
     const newCustomerInfo = req.body;
 
@@ -84,7 +103,7 @@ app.post("/customers", async (req, res)=> {
 });
 
 // Add the upodate customer data route.
-app.put("/customers/:id", async (req, res)=> {
+app.put("/customers/:id", appMiddleware, async (req, res)=> {
     // Getting the new customer data from the request body.
     const updateCustomerInfo = req.body;
     const updateCustomerId = req.params.id;
@@ -109,7 +128,7 @@ app.put("/customers/:id", async (req, res)=> {
 });
 
 // Add the delete customers by ID route.
-app.delete("/customers/:id", async (req, res)=> {
+app.delete("/customers/:id", appMiddleware, async (req, res)=> {
     const [cust, err] = await deleteCustomerByID(req.params.id);
     // adding error handler
     if(cust){
@@ -120,3 +139,7 @@ app.delete("/customers/:id", async (req, res)=> {
     }
 });
 
+
+app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+});
