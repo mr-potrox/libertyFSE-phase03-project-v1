@@ -3,6 +3,7 @@ import path from "path"; // for handling file paths.
 import bodyParser from "body-parser"; // for handling file paths.
 import dotenv from "dotenv";// for enabling the .env file.
 import {getAllCustomers, getCustomerByID,resetCustomers, addCustomer, updateCustomer, deleteCustomerByID} from "../data-server/data-access.js"; //Import 
+import {appMiddleware} from "../security/security_access.js"; //Import 
 import { fileURLToPath } from 'url';
 
 const dotenvConfig = dotenv.config();
@@ -17,28 +18,6 @@ const port = process.env.PORT || 4000; // use env var or default to 4000.
 
 // Set the static directory to serve files from.
 app.use(express.static(path.join(__dirname, '../public')));
-
-// appMiddleware middleware function
-const appMiddleware = (req, res, next) => {
-    // Get the expected header value from environment variable
-    let expectedApiKeyValue = process.env.API_KEY;
-    // Get the value of the custom header from the request
-    const requestApiKeyValue = (req.headers['x-api-key']) ? req.headers['x-api-key'] : req.query.api_key;
-
-    if (!requestApiKeyValue) {
-        res.status(401).json({ message: 'Unauthorized: API Key is missing' }); // Respond with API Key is missing message
-        
-    } else {
-       // Check if the request header matches the expected API_KEY value
-        if (requestApiKeyValue === expectedApiKeyValue) {
-            next(); // Allow access to the endpoint
-        } else {
-            res.status(403).json({ message: 'Unauthorized: API Key is invalid' }); // Respond with unauthorized status
-        }
-    }
-    
-};
-
 
 // Add the get route.
 app.get("/customers", appMiddleware, async (req, res)=> {
