@@ -1,8 +1,9 @@
 import express from "express";
 import path from "path"; // for handling file paths.
 import bodyParser from "body-parser"; // for handling file paths.
-import {getAllCustomers, getCustomerByID,resetCustomers, addCustomer, updateCustomer, deleteCustomerByID} from "../data-server/data-access.js"; //Import 
-import {appMiddleware} from "../security/security_access.js"; //Import 
+import {getAllCustomers, getCustomerByID,resetCustomers, 
+        addCustomer, updateCustomer, deleteCustomerByID} from "../data-server/data-access.js"; //Import 
+import {appMiddleware, appGenerateApiKeys, validateEmail} from "../security/security_access.js"; //Import 
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file.
@@ -25,6 +26,26 @@ app.get("/customers", appMiddleware, async (req, res)=> {
     }else{
         res.status(500);
         res.send(err);
+    } 
+});
+
+// Add the get route.
+app.get("/apikey", async (req, res)=> {
+    const { email } = req.query;
+    let errMsg;
+    let cust;
+    if(!validateEmail(email)){
+        console.log('error en el formato del email')
+        errMsg = 'error en el formato del email ' + email
+    }else{
+        cust = await appGenerateApiKeys(email);
+    }
+    // adding error handler
+    if(cust){
+        res.send(cust);
+    }else{
+        res.status(500);
+        res.send(errMsg);
     } 
 });
 
