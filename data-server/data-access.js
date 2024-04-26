@@ -144,6 +144,11 @@ async function searchCustomer(queryObject) {
       }
 };
 
+const generateCustomerId = () => {
+    const customers = customersConecction.find().toArray();
+    const nextCustId = 'CUST' + Math(customers.length ++)
+    console.log(nextCustId)
+}
 dbStartup();
 // Exporting the methods
 export  { getAllCustomers, getCustomerByID, resetCustomers, 

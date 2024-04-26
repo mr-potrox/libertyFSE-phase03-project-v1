@@ -36,8 +36,8 @@ app.get("/apikey", async (req, res)=> {
     let errMsg;
     let cust;
     if(!validateEmail(email)){
-        console.log('error en el formato del email')
-        errMsg = 'error en el formato del email ' + email
+        console.log('Invalid Email Format')
+        errMsg = 'Invalid Email Format ' + email
     }else{
         cust = await appGenerateApiKeys(email);
     }
