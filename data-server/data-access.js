@@ -132,6 +132,7 @@ async function deleteCustomerByID(id) {
 async function searchCustomer(queryObject) {
     try {
         // Searchung the user from custbd on MongoDb 
+
         const searchResult = await customersConecction.find(queryObject).toArray();
         if(!searchResult || searchResult.length === 0 ){
             return [ null, "no matching customer documents found"];
