@@ -126,6 +126,24 @@ async function deleteCustomerByID(id) {
     }
 };
 
+// Declaring searchCustomer method.
+// Use this Method to search the customer data filtered by name, email,
+// password from mongodb database.
+async function searchCustomer(queryObject) {
+    try {
+        // Searchung the user from custbd on MongoDb 
+        const searchResult = await customersConecction.find(queryObject).toArray();
+        if(!searchResult || searchResult.length === 0 ){
+            return [ null, "no matching customer documents found"];
+        }
+        return [searchResult, null];
+      } catch (err) {
+        console.log(err.message);
+        return [null, err.message];
+      }
+};
+
 dbStartup();
 // Exporting the methods
-export  { getAllCustomers, getCustomerByID, resetCustomers, addCustomer, updateCustomer, deleteCustomerByID };
+export  { getAllCustomers, getCustomerByID, resetCustomers, 
+        addCustomer, updateCustomer, deleteCustomerByID, searchCustomer };

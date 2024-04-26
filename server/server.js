@@ -2,7 +2,8 @@ import express from "express";
 import path from "path"; // for handling file paths.
 import bodyParser from "body-parser"; // for handling file paths.
 import {getAllCustomers, getCustomerByID,resetCustomers, 
-        addCustomer, updateCustomer, deleteCustomerByID} from "../data-server/data-access.js"; //Import 
+        addCustomer, updateCustomer, deleteCustomerByID,
+        searchCustomer} from "../data-server/data-access.js"; //Import 
 import {appMiddleware, appGenerateApiKeys, validateEmail} from "../security/security_access.js"; //Import 
 import { fileURLToPath } from 'url';
 
@@ -51,6 +52,7 @@ app.get("/apikey", async (req, res)=> {
 
 // Add the get customers by ID route.
 app.get("/customers/:id", appMiddleware, async (req, res)=> {
+
     const [cust, err] = await getCustomerByID(req.params.id);
     // adding error handler
     if(cust){
@@ -59,6 +61,33 @@ app.get("/customers/:id", appMiddleware, async (req, res)=> {
         res.status(500);
         res.send(err);
     } 
+});
+
+
+// Add the search customers route.
+app.get("/customer/find", async (req, res)=> {
+    let query;
+    
+    let { email , name, id, password} = req.query;
+
+    // building the query array.
+    if(id){ query = {"id": id}};
+    if(email){ query = {"email": email}};
+    if(password){ query = {"password": password}};
+    if(name){ query = {"name": name}};
+
+    if (query) {
+        const [customers, err] = await searchCustomer(query);
+        if (customers) {
+            res.send(customers);
+        } else {
+            res.status(404);
+            res.send(err);
+        }
+    } else {
+        res.status(400);
+        res.send("query string is required");
+    }
 });
 
 // Add the get customers by ID route.
